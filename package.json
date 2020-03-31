@@ -1,0 +1,24 @@
+{
+  "name": "virtualclass-bot",
+  "version": "1.0.0",
+  "description": "This is a discord bot that features a lot of commands that helps teacher control their virtuel classrooms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fredrikj31/VirtualClass-Bot.git"
+  },
+  "author": "Fredrik Johansen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fredrikj31/VirtualClass-Bot/issues"
+  },
+  "homepage": "https://github.com/fredrikj31/VirtualClass-Bot#readme",
+  "dependencies": {
+    "ascii-table": "0.0.9",
+    "discord.js": "^12.1.1",
+    "dotenv": "^8.2.0"
+  }
+}
