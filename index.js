@@ -1,56 +1,59 @@
-const { Client, MessageEmbed } = require('discord.js');
-
-const { config } = require('dotenv');
+const { Client, Collection } = require("discord.js");
+const { TOKEN, PREFIX } = require("./settings.json");
 
 const client = new Client({
-	disableEveryone: true
+	disableEveryone: true,
 });
-
-config({
-	path: __dirname + "/.env"
-})
-
 
 client.on("ready", () => {
 	console.log(`I'm online! My name is ${client.user.username}`);
 
-	client.user.setActivity('Students study!', { type: 'WATCHING' })
+	client.user.setActivity(`Serving ${client.guilds.cache.size} classrooms`, {
+		type: "WATCHING",
+	});
 });
 
-client.on("message", async message => {
-	
-	const prefix = "!"
-
+client.on("message", async (message) => {
 	if (message.author.bot) return;
-	if (!message.guild) return;
-	if (!message.content.startsWith(prefix)) return;
-	if (!message.member) message.member = await message.guild.fetchMember(message);
+	if (message.content.indexOf(PREFIX) !== 0) return;
 
+	const args = message.content
+		.slice(PREFIX.length)
+		.trim()
+		.split(/ +/g);
+	const command = args.shift().toLowerCase();
 
-	const args = message.content.slice(prefix.length).trim().split(/ +/g);
-	const cmd = args.shift().toLowerCase();
-
-	//Commands
-	if (cmd === "ping") {
+	if (command === "ping") {
 		const msg = await message.channel.send(`🏓 Pinging....`);
 
-        msg.edit(`🏓 Pong! Latency is ${Math.floor(msg.createdAt - message.createdAt)}ms`);
+		msg.edit(`🏓 Pong! Latency is ${Math.floor(msg.createdAt - message.createdAt)}ms`);
 	}
 
-	if (cmd === "moveall") {
-		const ownerChannel = message.member.voice.channel
-		//if (ownerChannel) {
-			// Get the Guild and store it under the variable "list"
-			const offlineMembers = guild.members.filter(member => member.presence.status === "offline");
+	if (command === "say") {
+		const sayMessage = args.join(" ");
+		message.delete().catch((O_o) => {});
+		message.channel.send(sayMessage);
+	}
 
-			console.log(offlineMembers);
+	if (command === "moveall") {
+		let userChannel = message.member.voice.channel;
+		let onlineUsers = message.guild.voiceStates.cache;
+		if (!userChannel) {
+			message.channel.send(":x: You are not connected to a voice channel.");
+		} else {
+			//console.log(onlineUsers)
+			if (onlineUsers.size > 0) {
+				//console.log(onlineUsers)
+				onlineUsers.forEach((value, key) => {
+					selectedUser = message.guild.member(key);
+					//console.log(selectedUser);
+					selectedUser.voice.setChannel(userChannel);
+				});
+			} else {
+				message.channel.send(":x: There is nobody in a voice channel on this server.");
+			}
+		}
+	}
+});
 
-			// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
-			//list.members.forEach(member => console.log(member.user.username)); 
-		/*} else {
-			message.reply("You need to join a voice channel first!");
-		}*/
-	} 
-})
-
-client.login(process.env.TOKEN);
+client.login(TOKEN);
