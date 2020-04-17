@@ -46,20 +46,41 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		//Added to hands role
 		(await userGuild).roles.add(handRole.id);
 		
-		
+		//Change their nickname
+		console.log((await userGuild).displayName);
+		(await userGuild).setNickname(`${(await userGuild).displayName} ----- 👋`);
 	}
 });
 
 
-client.on("messageReactionRemove", (messageReaction, user) => {
-	if (user.bot) return;
-	const { message, emoji } = messageReaction;
-	
-	if (emoji.name === "✋") {
-		console.log("You removed reaction with thumbs up.");
-		//? TODO Function to remove user to role and edit username
-		const handRole = user.guild.roles.cache.find(role => role.name === "Hands")
-		user.removeRole(handRole).catch(console.error);
+client.on("messageReactionRemove", async (reaction, user) => {
+	// When we receive a reaction we check if the reaction is partial or not
+	if (reaction.partial) {
+		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.log('Something went wrong when fetching the message: ', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
+
+	console.log(`${user.username} removed his/her reaction on ${reaction.message.author.username}'s message with ${reaction.emoji}`);
+
+	if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
+		console.log("You reacted with thumbs up.");
+		//? Function that adds user to role and edits the username
+		let handRole = reaction.message.guild.roles.cache.find(role => role.name === "Hands");
+		let userGuild = reaction.message.guild.members.fetch(user);
+		
+		//Added to hands role
+		(await userGuild).roles.remove(handRole.id);
+		
+		//Change their nickname
+		console.log((await userGuild).displayName);
+		let stripedUsername = ((await userGuild).displayName).split("-----")[0].trim();
+		(await userGuild).setNickname(stripedUsername);
 	}
 });
 
