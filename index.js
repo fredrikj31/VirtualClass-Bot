@@ -1,4 +1,4 @@
-const { Client } = require("discord.js");
+const { Client, MessageEmbed } = require("discord.js");
 const { TOKEN, PREFIX } = require("./settings.json");
 
 const handCooldown = new Set();
@@ -18,6 +18,9 @@ client.on("ready", () => {
 
 // Hands reaction
 client.on("messageReactionAdd", async (reaction, user) => {
+
+	if (user.bot) return;
+
 	// When we receive a reaction we check if the reaction is partial or not
 	if (reaction.partial) {
 		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -65,6 +68,9 @@ client.on("messageReactionAdd", async (reaction, user) => {
 });
 
 client.on("messageReactionRemove", async (reaction, user) => {
+
+	if (user.bot) return;
+
 	// When we receive a reaction we check if the reaction is partial or not
 	if (reaction.partial) {
 		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -151,13 +157,21 @@ client.on("message", async (message) => {
 		}
 	}
 
-	if (command === "nickname") {
-		/*if (message.guild.members.get(client.user.id).hasPermission("MANAGE_NICKNAMES") && message.guild.members.get(client.user.id).hasPermission("CHANGE_NICKNAME")) {
-			message.guild.cache.get(client.user.id).setNickname("Nickname Here");
-		} else {
-			message.channel.sendMessage("I dont have the permissons to change my nickname in this server.");
-		}*/
-		console.log(message.guild.cache);
+	if (command === "setuphand") {
+		const exampleEmbed = new MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('✋ Raise/Lower Hand')
+			.setDescription("You need to react to this message for the system to work.")
+			.addFields(
+				{ name: 'To raise your hand.', value: 'React with this emoji: ✋'},
+				{ name: 'To lower your hand.', value: 'Remove your reaction.'},
+			)
+			.setTimestamp()
+			.setFooter('Setup Timestamp');
+
+		var embedMSG = message.channel.send(exampleEmbed);
+
+		(await embedMSG).react("✋")
 	}
 
 	if (command === "servercache") {
@@ -165,10 +179,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "test") {
-		const role = message.guild.roles.cache.find(
-			(role) => role.name === "Angel"
-		);
-		console.log(role.members);
+		message.channel.send("Hey")
 	}
 });
 
