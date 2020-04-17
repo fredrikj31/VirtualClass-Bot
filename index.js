@@ -47,23 +47,36 @@ client.on("messageReactionAdd", async (reaction, user) => {
 		`${user.username} reacted on ${reaction.message.author.username}'s message with ${reaction.emoji}`
 	);
 
-	if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
-		//Function
-		console.log("You reacted with thumbs up.");
-		//? Function that adds user to role and edits the username
-		let handRole = reaction.message.guild.roles.cache.find(
-			(role) => role.name === "Hands"
-		);
-		let userGuild = reaction.message.guild.members.fetch(user);
+	if (reaction.message.author.username === client.user.username) {
+		if (handCooldown.has(user.id)) {
+			user.send("Do not spam this function. You can use this every second.");
+		} else {
+			if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
+				//Function
+				console.log("You reacted with thumbs up.");
+				//? Function that adds user to role and edits the username
+				let handRole = reaction.message.guild.roles.cache.find(
+					(role) => role.name === "Hand"
+				);
+				let userGuild = reaction.message.guild.members.fetch(user);
 
-		//Added to hands role
-		(await userGuild).roles.add(handRole.id);
+				//Added to hands role
+				(await userGuild).roles.add(handRole.id);
 
-		//Change their nickname
-		console.log((await userGuild).displayName);
-		(await userGuild).setNickname(
-			`${(await userGuild).displayName} ----- 👋`
-		);
+				//Change their nickname
+				console.log((await userGuild).displayName);
+				(await userGuild).setNickname(
+					`${(await userGuild).displayName} ----- 👋`
+				);
+
+				//Adds the cooldown
+				handCooldown.add(user.id);
+				setTimeout(() => {
+				  // Removes the user from the set after a minute
+				  handCooldown.delete(user.id);
+				}, 1000);
+			}
+		}
 	}
 });
 
@@ -90,23 +103,36 @@ client.on("messageReactionRemove", async (reaction, user) => {
 		`${user.username} removed his/her reaction on ${reaction.message.author.username}'s message with ${reaction.emoji}`
 	);
 
-	if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
-		console.log("You reacted with thumbs up.");
-		//? Function that adds user to role and edits the username
-		let handRole = reaction.message.guild.roles.cache.find(
-			(role) => role.name === "Hands"
-		);
-		let userGuild = reaction.message.guild.members.fetch(user);
+	if (reaction.message.author.username === client.user.username) {
+		if (handCooldown.has(user.id)) {
+			user.send("Do not spam this function. You can use this every second.");
+		} else {
+			if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
+				console.log("You reacted with thumbs up.");
+				//? Function that adds user to role and edits the username
+				let handRole = reaction.message.guild.roles.cache.find(
+					(role) => role.name === "Hand"
+				);
+				let userGuild = reaction.message.guild.members.fetch(user);
+		
+				//Added to hands role
+				(await userGuild).roles.remove(handRole.id);
+		
+				//Change their nickname
+				console.log((await userGuild).displayName);
+				let stripedUsername = (await userGuild).displayName
+					.split("-----")[0]
+					.trim();
+				(await userGuild).setNickname(stripedUsername);
 
-		//Added to hands role
-		(await userGuild).roles.remove(handRole.id);
-
-		//Change their nickname
-		console.log((await userGuild).displayName);
-		let stripedUsername = (await userGuild).displayName
-			.split("-----")[0]
-			.trim();
-		(await userGuild).setNickname(stripedUsername);
+				//Adds the cooldown
+				handCooldown.add(user.id);
+				setTimeout(() => {
+				  // Removes the user from the set after a minute
+				  handCooldown.delete(user.id);
+				}, 1000);
+			}
+		}
 	}
 });
 
@@ -158,10 +184,11 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "setuphand") {
+		message.delete();
 		const exampleEmbed = new MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle('✋ Raise/Lower Hand')
-			.setDescription("You need to react to this message for the system to work.")
+			.setDescription("You need to react to this message, but do not spam it.")
 			.addFields(
 				{ name: 'To raise your hand.', value: 'React with this emoji: ✋'},
 				{ name: 'To lower your hand.', value: 'Remove your reaction.'},
@@ -174,12 +201,26 @@ client.on("message", async (message) => {
 		(await embedMSG).react("✋")
 	}
 
+	if (command == "purge") {
+		const amount = args.join(' '); // Amount of messages which should be deleted
+
+		if (!amount) return message.reply('You haven\'t given an amount of messages which should be deleted!'); // Checks if the `amount` parameter is given
+		if (isNaN(amount)) return message.reply('The amount parameter isn`t a number!'); // Checks if the `amount` parameter is a number. If not, the command throws an error
+
+		if (amount > 50) return message.reply('You can`t delete more than 50 messages at once!'); // Checks if the `amount` integer is bigger than 100
+		if (amount < 1) return message.reply('You have to delete at least 1 message!'); // Checks if the `amount` integer is smaller than 1
+
+		await message.channel.messages.fetch({ limit: amount+1 }).then(messages => { // Fetches the messages
+			message.channel.bulkDelete(messages // Bulk deletes all messages that have been fetched and are not older than 14 days (due to the Discord API)
+		)});
+	}
+
 	if (command === "servercache") {
 		console.log(message.guild);
 	}
 
 	if (command === "test") {
-		message.channel.send("Hey")
+		console.log(client.user.username);
 	}
 });
 
