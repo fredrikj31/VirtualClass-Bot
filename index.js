@@ -1,9 +1,11 @@
-const { Client, Collection } = require("discord.js");
+const { Client } = require("discord.js");
 const { TOKEN, PREFIX } = require("./settings.json");
+
+const handCooldown = new Set();
 
 const client = new Client({
 	disableEveryone: true,
-	partials: ['MESSAGE', 'CHANNEL', 'REACTION']
+	partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
 
 client.on("ready", () => {
@@ -15,14 +17,17 @@ client.on("ready", () => {
 });
 
 // Hands reaction
-client.on('messageReactionAdd', async (reaction, user) => {
+client.on("messageReactionAdd", async (reaction, user) => {
 	// When we receive a reaction we check if the reaction is partial or not
 	if (reaction.partial) {
 		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.log('Something went wrong when fetching the message: ', error);
+			console.log(
+				"Something went wrong when fetching the message: ",
+				error
+			);
 			// Return as `reaction.message.author` may be undefined/null
 			return;
 		}
@@ -35,23 +40,29 @@ client.on('messageReactionAdd', async (reaction, user) => {
 	console.log("-----------------");
 	console.log(user)*/
 
-	console.log(`${user.username} reacted on ${reaction.message.author.username}'s message with ${reaction.emoji}`);
+	console.log(
+		`${user.username} reacted on ${reaction.message.author.username}'s message with ${reaction.emoji}`
+	);
 
 	if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
+		//Function
 		console.log("You reacted with thumbs up.");
 		//? Function that adds user to role and edits the username
-		let handRole = reaction.message.guild.roles.cache.find(role => role.name === "Hands");
+		let handRole = reaction.message.guild.roles.cache.find(
+			(role) => role.name === "Hands"
+		);
 		let userGuild = reaction.message.guild.members.fetch(user);
-		
+
 		//Added to hands role
 		(await userGuild).roles.add(handRole.id);
-		
+
 		//Change their nickname
 		console.log((await userGuild).displayName);
-		(await userGuild).setNickname(`${(await userGuild).displayName} ----- 👋`);
+		(await userGuild).setNickname(
+			`${(await userGuild).displayName} ----- 👋`
+		);
 	}
 });
-
 
 client.on("messageReactionRemove", async (reaction, user) => {
 	// When we receive a reaction we check if the reaction is partial or not
@@ -60,26 +71,35 @@ client.on("messageReactionRemove", async (reaction, user) => {
 		try {
 			await reaction.fetch();
 		} catch (error) {
-			console.log('Something went wrong when fetching the message: ', error);
+			console.log(
+				"Something went wrong when fetching the message: ",
+				error
+			);
 			// Return as `reaction.message.author` may be undefined/null
 			return;
 		}
 	}
 
-	console.log(`${user.username} removed his/her reaction on ${reaction.message.author.username}'s message with ${reaction.emoji}`);
+	console.log(
+		`${user.username} removed his/her reaction on ${reaction.message.author.username}'s message with ${reaction.emoji}`
+	);
 
 	if (reaction.emoji.name === "✋" || reaction.emoji.name === "👍") {
 		console.log("You reacted with thumbs up.");
 		//? Function that adds user to role and edits the username
-		let handRole = reaction.message.guild.roles.cache.find(role => role.name === "Hands");
+		let handRole = reaction.message.guild.roles.cache.find(
+			(role) => role.name === "Hands"
+		);
 		let userGuild = reaction.message.guild.members.fetch(user);
-		
+
 		//Added to hands role
 		(await userGuild).roles.remove(handRole.id);
-		
+
 		//Change their nickname
 		console.log((await userGuild).displayName);
-		let stripedUsername = ((await userGuild).displayName).split("-----")[0].trim();
+		let stripedUsername = (await userGuild).displayName
+			.split("-----")[0]
+			.trim();
 		(await userGuild).setNickname(stripedUsername);
 	}
 });
@@ -145,7 +165,9 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "test") {
-		const role = message.guild.roles.cache.find(role => role.name === "Angel")
+		const role = message.guild.roles.cache.find(
+			(role) => role.name === "Angel"
+		);
 		console.log(role.members);
 	}
 });
