@@ -403,4 +403,4 @@ client.on("message", async (message) => {
 	}
 });
 
-client.login(process.env.IP);
+client.login(process.env.TOKEN);
