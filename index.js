@@ -37,10 +37,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 	//console.log(`${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`);
 	//console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
 
-	//console.log(reaction.emoji.name);
-	/*console.log(reaction);
-	console.log("-----------------");
-	console.log(user)*/
+	//console.log(reaction)
 
 	/*console.log(
 		`${user.username} reacted on ${reaction.message.author.username}'s message with ${reaction.emoji}`
@@ -80,20 +77,22 @@ client.on("messageReactionAdd", async (reaction, user) => {
 			}
 		}
 		// HELP FUNCTION
-		if (reaction.emoji.name === "✅") {
-			let userGuild = reaction.message.guild.members.fetch(user);
-			if ((await userGuild).roles.some(role => role.name === 'Teacher')) {
-				//console.log(reaction.message);
+		if (reaction.message.channel.name === "help") {
+			if (reaction.emoji.name === "✅") {
+				let userGuild = reaction.message.guild.members.fetch(user);
+				if ((await userGuild).roles.cache.find(r => r.name === "Teacher")) {
+					//console.log(reaction.message);
 
-				var messageId = reaction.message.id;
+					var messageId = reaction.message.id;
 
-				//console.log(reaction.message.channel)
+					//console.log(reaction.message.channel)
 
-				reaction.message.channel.messages.fetch(messageId)
-				.then((message) => {
-					message.delete();
-				})
-				.catch(console.error);
+					reaction.message.channel.messages.fetch(messageId)
+					.then((message) => {
+						message.delete();
+					})
+					.catch(console.error);
+				}
 			}
 		}
 	}
@@ -363,6 +362,8 @@ client.on("message", async (message) => {
 
 	if (command === "help") {
 		// Command: !help <voice channel> <Optional text>
+
+		var userGuild = message.member.guild.members.fetch(message.author);
 		var voiceChannel = args[0]
 		var extraComment = args.slice(1).join(" ");
 
@@ -371,18 +372,32 @@ client.on("message", async (message) => {
 		}
 
 		//Finding the help channel
-		var helpChannel = message.guild.channels.cache.find();
+		var helpChannel = message.guild.channels.cache.find(c => c.name === "help");
 		if(!helpChannel) return message.channel.send(":x: Could not find the help channel. Create a channel called (help) to make this function work.");
 
-		helpChannel.send("Hey");
+		const helpEmbed = new MessageEmbed()
+			.setColor("#0099ff")
+			.setAuthor("✍️ Help needed")
+			.setTitle(`${(await (await userGuild).displayName)} wants your help.`)
+			.setThumbnail(message.author.avatarURL())
+			.addFields(
+				{ name: 'Voice Channel:', value: voiceChannel, inline: true },
+				{ name: 'Extra Comment:', value: extraComment, inline: true },
+				{ name: 'Mark this as done', value: 'Click this ✅ to mark it as done.' },
+			)
+			.setTimestamp()
+			.setFooter("Help Time: ");
 
+		var sendEmbed = helpChannel.send(helpEmbed);
+
+		(await sendEmbed).react("✅")
 	}
 
 	if (command === "commands") {
 	}
 
 	if (command == "test") {
-		console.log(message.channel)
+		console.log(message.author.avatarURL())
 		message.channel.send("Hey!");
 	}
 });
