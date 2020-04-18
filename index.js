@@ -47,12 +47,13 @@ client.on("messageReactionAdd", async (reaction, user) => {
 	);*/
 
 	if (reaction.message.author.username === client.user.username) {
-		if (handCooldown.has(user.id)) {
-			user.send(
-				"Do not spam this function. You can use this every second."
-			);
-		} else {
-			if (reaction.emoji.name === "✋") {
+		// HAND FUNCTION
+		if (reaction.emoji.name === "✋") {
+			if (handCooldown.has(user.id)) {
+				user.send(
+					"Do not spam this function. You can use this every second."
+				);
+			} else {
 				//Function
 				console.log("You reacted with thumbs up.");
 				//? Function that adds user to role and edits the username
@@ -60,22 +61,39 @@ client.on("messageReactionAdd", async (reaction, user) => {
 					(role) => role.name === "Hand"
 				);
 				let userGuild = reaction.message.guild.members.fetch(user);
-
+	
 				//Added to hands role
 				(await userGuild).roles.add(handRole.id);
-
+	
 				//Change their nickname
 				console.log((await userGuild).displayName);
 				(await userGuild).setNickname(
 					`${(await userGuild).displayName} ----- 👋`
 				);
-
+	
 				//Adds the cooldown
 				handCooldown.add(user.id);
 				setTimeout(() => {
 					// Removes the user from the set after a minute
 					handCooldown.delete(user.id);
 				}, 1000);
+			}
+		}
+		// HELP FUNCTION
+		if (reaction.emoji.name === "✅") {
+			let userGuild = reaction.message.guild.members.fetch(user);
+			if ((await userGuild).roles.some(role => role.name === 'Teacher')) {
+				//console.log(reaction.message);
+
+				var messageId = reaction.message.id;
+
+				//console.log(reaction.message.channel)
+
+				reaction.message.channel.messages.fetch(messageId)
+				.then((message) => {
+					message.delete();
+				})
+				.catch(console.error);
 			}
 		}
 	}
@@ -102,31 +120,33 @@ client.on("messageReactionRemove", async (reaction, user) => {
 	/*console.log(
 		`${user.username} removed his/her reaction on ${reaction.message.author.username}'s message with ${reaction.emoji}`
 	);*/
+	
 
 	if (reaction.message.author.username === client.user.username) {
-		if (handCooldown.has(user.id)) {
-			user.send(
-				"Do not spam this function. You can use this every second."
-			);
-		} else {
-			if (reaction.emoji.name === "✋") {
-				console.log("You reacted with thumbs up.");
+		// HAND FUNCTION
+		if (reaction.emoji.name === "✋") {
+			if (handCooldown.has(user.id)) {
+				user.send(
+					"Do not spam this function. You can use this every second."
+				);
+			} else {
+				//console.log("You reacted with thumbs up.");
 				//? Function that adds user to role and edits the username
 				let handRole = reaction.message.guild.roles.cache.find(
 					(role) => role.name === "Hand"
 				);
 				let userGuild = reaction.message.guild.members.fetch(user);
-
+	
 				//Added to hands role
 				(await userGuild).roles.remove(handRole.id);
-
+	
 				//Change their nickname
-				console.log((await userGuild).displayName);
+				//console.log((await userGuild).displayName);
 				let stripedUsername = (await userGuild).displayName
 					.split("-----")[0]
 					.trim();
 				(await userGuild).setNickname(stripedUsername);
-
+	
 				//Adds the cooldown
 				handCooldown.add(user.id);
 				setTimeout(() => {
@@ -146,7 +166,7 @@ client.on("message", async (message) => {
 	const command = args.shift().toLowerCase();
 
 	if (command === "ping") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			const msg = await message.channel.send(`🏓 Pinging....`);
 
 			msg.edit(
@@ -160,7 +180,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "moveall") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			let userChannel = message.member.voice.channel;
 			let onlineUsers = message.guild.voiceStates.cache;
 			if (!userChannel) {
@@ -188,7 +208,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "setuphand") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			message.delete();
 			const exampleEmbed = new MessageEmbed()
 				.setColor("#0099ff")
@@ -215,7 +235,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command == "purge") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			const amount = args[0]; // Amount of messages which should be deleted
 
 			if (!amount)
@@ -248,7 +268,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "servercache") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			console.log(message.guild);
 		} else {
 			message.reply(":x: You don't have permission to use this command.");
@@ -256,7 +276,7 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "absence") {
-		if (message.member.roles.some(role => role.name === 'Teacher')) {
+		if (message.member.roles.cache.find(r => r.name === "Teacher")) {
 			//Command: /absence <time before result>
 
 			userTyped = message.author;
@@ -342,9 +362,28 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "help") {
+		// Command: !help <voice channel> <Optional text>
+		var voiceChannel = args[0]
+		var extraComment = args.slice(1).join(" ");
+
+		if (!voiceChannel) {
+			message.reply(":x: You need to type in your voicechannel.");
+		}
+
+		//Finding the help channel
+		var helpChannel = message.guild.channels.cache.find();
+		if(!helpChannel) return message.channel.send(":x: Could not find the help channel. Create a channel called (help) to make this function work.");
+
+		helpChannel.send("Hey");
+
 	}
 
 	if (command === "commands") {
+	}
+
+	if (command == "test") {
+		console.log(message.channel)
+		message.channel.send("Hey!");
 	}
 });
 
