@@ -1,5 +1,6 @@
 const { Client, MessageEmbed } = require("discord.js");
-const { TOKEN, PREFIX } = require("./settings.json");
+
+const PREFIX = "!"
 
 const handCooldown = new Set();
 
@@ -402,4 +403,4 @@ client.on("message", async (message) => {
 	}
 });
 
-client.login(TOKEN);
+client.login(process.env.IP);
