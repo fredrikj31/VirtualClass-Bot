@@ -405,7 +405,7 @@ client.on("message", async (message) => {
 				{ name: '* !absence <Minutes>', value: "Creates a present check for a custom time that you set.", inline: true },
 				{ name: '* !purge <# Messages>', value: "Deletes the last # message for a channel.", inline: true },
 				{ name: '* !setuphand', value: "Creates the message where students can raise their hand.", inline: true },
-				{ name: '* !moveall <Minutes>', value: "Creates a present check for a custom time that you set.", inline: true },
+				{ name: '* !moveall', value: "Moves all students into your voice channel.", inline: true },
 				{ name: '* !ping', value: "Pings the discord API to see if the bots is lagging.", inline: true },
 			)
 			.setTimestamp()
