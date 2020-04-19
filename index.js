@@ -340,7 +340,11 @@ client.on("message", async (message) => {
 						);
 						serverUsername.then((user) => {
 							//console.log(user.nickname)
-							finalList.push(user.nickname);
+							if (user.nickname == null) {
+								finalList.push(user.user.username);
+							} else {
+								finalList.push(user.nickname);
+							}
 						});
 					});
 					resolve();
@@ -351,7 +355,7 @@ client.on("message", async (message) => {
 					topLine = "------------------------------------------------------------- **Present Status** -------------------------------------------------------------\n"
 					bottomLine = "\n---------------------------------------------------------------------------------------------------------------------------------------------"
 
-					outputMessage = topLine + "The present status you created at: " + "`" + timeCreated + "` is finish, and the results are here. \n\n **These students were present:**\n" + finalList.map((item, i) => `${i + 1}. ${item}`).join("\r\n") + bottomLine
+					outputMessage = topLine + "The present status you created at: " + "`" + timeCreated + "` is finish, and the results are here. \n\n**Disclaimer!** *If you see an unusual name, it's because they have not change their username on the server to their real name.* \n\n **These students were present:**\n" + finalList.map((item, i) => `${i + 1}. ${item}`).join("\r\n") + bottomLine
 
 					userTyped.send(outputMessage);
 				});
@@ -362,11 +366,10 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "help") {
-		// Command: !help <voice channel> <Optional text>
+		// Command: !help <voice channel>
 
 		var userGuild = message.member.guild.members.fetch(message.author);
 		var voiceChannel = args[0]
-		var extraComment = args.slice(1).join(" ");
 
 		if (!voiceChannel) {
 			message.reply(":x: You need to type in your voicechannel.");
@@ -382,8 +385,7 @@ client.on("message", async (message) => {
 			.setTitle(`${(await (await userGuild).displayName)} wants your help.`)
 			.setThumbnail(message.author.avatarURL())
 			.addFields(
-				{ name: 'Voice Channel:', value: voiceChannel, inline: true },
-				{ name: 'Extra Comment:', value: extraComment, inline: true },
+				{ name: 'Voice Channel:', value: voiceChannel },
 				{ name: 'Mark this as done', value: 'Click this ✅ to mark it as done.' },
 			)
 			.setTimestamp()
@@ -395,12 +397,31 @@ client.on("message", async (message) => {
 	}
 
 	if (command === "commands") {
+		const commandsEmbed = new MessageEmbed()
+			.setColor("#0099ff")
+			.setTitle("Commands:")
+			.addFields(
+				{ name: '!help <Voice Channel>', value: "Ask a teacher for help, when you are in a voice channel.", inline: true },
+				{ name: '* !absence <Minutes>', value: "Creates a present check for a custom time that you set.", inline: true },
+				{ name: '* !purge <# Messages>', value: "Deletes the last # message for a channel.", inline: true },
+				{ name: '* !setuphand', value: "Creates the message where students can raise their hand.", inline: true },
+				{ name: '* !moveall <Minutes>', value: "Creates a present check for a custom time that you set.", inline: true },
+				{ name: '* !ping', value: "Pings the discord API to see if the bots is lagging.", inline: true },
+			)
+			.setTimestamp()
+			.setFooter("All commands with a star can only be executed by teachers.");
+
+		message.channel.send(commandsEmbed);
 	}
 
 	if (command == "test") {
-		console.log(message.author.avatarURL())
-		message.channel.send("Hey!");
+		var serverUsername = message.guild.members.fetch(
+			message.author.id
+		);
+
+		console.log((await serverUsername));
 	}
 });
 
-client.login(process.env.TOKEN);
+//client.login(process.env.TOKEN);
+client.login("Njk0MjI1MDQ0NzQxODE2MzIw.Xpxt1w.P-0TEpdixoZHQVVm9w_mPRtJr4U")
