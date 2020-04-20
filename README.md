@@ -2,11 +2,15 @@
 
 Virtual Classroom is a discord bot that runs discord.js.
 
-I created the bot because my teachers need a bot to make their life easier in the discord server.
+I created the bot because my teachers needed a bot to make their life easier in the discord server.
 
 ## Installation
-To get started you need to follow this link to invite the bot to your server.
+**1.** To get started you need to make a server via this server template: [Template here](https://discord.new/Aw9nWfkf9Pfq)
+
+**2.** Then follow this link to invite the bot to your server.
 [Click here](https://discordapp.com/oauth2/authorize?client_id=694225044741816320&scope=bot&permissions=2146958847)
+
+**3.** You will need to ensure that the bot is on top of the roles.
 
 After you finish that step you are good to go.
 
