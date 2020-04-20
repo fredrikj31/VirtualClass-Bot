@@ -369,7 +369,7 @@ client.on("message", async (message) => {
 		// Command: !help <voice channel>
 
 		var userGuild = message.member.guild.members.fetch(message.author);
-		var voiceChannel = args[0]
+		var voiceChannel = args.slice(0).join(' ');
 
 		if (!voiceChannel) {
 			message.reply(":x: You need to type in your voicechannel.");
