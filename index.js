@@ -49,7 +49,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 		if (reaction.emoji.name === "✋") {
 			if (handCooldown.has(user.id)) {
 				user.send(
-					"Do not spam this function. You can use this every second."
+					"Do not spam this function. You can use this every 5 second."
 				);
 			} else {
 				//Function
@@ -127,7 +127,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
 		if (reaction.emoji.name === "✋") {
 			if (handCooldown.has(user.id)) {
 				user.send(
-					"Do not spam this function. You can use this every second."
+					"Do not spam this function. You can use this every 5 second."
 				);
 			} else {
 				//console.log("You reacted with thumbs up.");
