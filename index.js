@@ -74,7 +74,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
 				setTimeout(() => {
 					// Removes the user from the set after a minute
 					handCooldown.delete(user.id);
-				}, 1000);
+				}, 5000);
 			}
 		}
 		// HELP FUNCTION
@@ -152,7 +152,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
 				setTimeout(() => {
 					// Removes the user from the set after a minute
 					handCooldown.delete(user.id);
-				}, 1000);
+				}, 5000);
 			}
 		}
 	}
