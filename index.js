@@ -2,8 +2,6 @@ const { Client, MessageEmbed } = require("discord.js");
 
 const PREFIX = "!"
 
-const handCooldown = new Set();
-
 const client = new Client({
 	disableEveryone: true,
 	partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -47,35 +45,16 @@ client.on("messageReactionAdd", async (reaction, user) => {
 	if (reaction.message.author.username === client.user.username) {
 		// HAND FUNCTION
 		if (reaction.emoji.name === "✋") {
-			if (handCooldown.has(user.id)) {
-				user.send(
-					"Do not spam this function. You can use this every 5 second."
-				);
-			} else {
-				//Function
-				console.log("You reacted with thumbs up.");
-				//? Function that adds user to role and edits the username
-				let handRole = reaction.message.guild.roles.cache.find(
-					(role) => role.name === "Hand"
-				);
-				let userGuild = reaction.message.guild.members.fetch(user);
+			//Function
+			console.log("You reacted with thumbs up.");
+			//? Function that adds user to role and edits the username
+			let handRole = reaction.message.guild.roles.cache.find(
+				(role) => role.name === "Hand"
+			);
+			let userGuild = reaction.message.guild.members.fetch(user);
 	
-				//Added to hands role
-				(await userGuild).roles.add(handRole.id);
-	
-				//Change their nickname
-				console.log((await userGuild).displayName);
-				(await userGuild).setNickname(
-					`${(await userGuild).displayName} ----- 👋`
-				);
-	
-				//Adds the cooldown
-				handCooldown.add(user.id);
-				setTimeout(() => {
-					// Removes the user from the set after a minute
-					handCooldown.delete(user.id);
-				}, 5000);
-			}
+			//Added to hands role
+			(await userGuild).roles.add(handRole.id);
 		}
 		// HELP FUNCTION
 		if (reaction.message.channel.name === "help") {
@@ -125,35 +104,15 @@ client.on("messageReactionRemove", async (reaction, user) => {
 	if (reaction.message.author.username === client.user.username) {
 		// HAND FUNCTION
 		if (reaction.emoji.name === "✋") {
-			if (handCooldown.has(user.id)) {
-				user.send(
-					"Do not spam this function. You can use this every 5 second."
-				);
-			} else {
-				//console.log("You reacted with thumbs up.");
-				//? Function that adds user to role and edits the username
-				let handRole = reaction.message.guild.roles.cache.find(
-					(role) => role.name === "Hand"
-				);
-				let userGuild = reaction.message.guild.members.fetch(user);
+			//console.log("You reacted with thumbs up.");
+			//? Function that adds user to role and edits the username
+			let handRole = reaction.message.guild.roles.cache.find(
+				(role) => role.name === "Hand"
+			);
+			let userGuild = reaction.message.guild.members.fetch(user);
 	
-				//Added to hands role
-				(await userGuild).roles.remove(handRole.id);
-	
-				//Change their nickname
-				//console.log((await userGuild).displayName);
-				let stripedUsername = (await userGuild).displayName
-					.split("-----")[0]
-					.trim();
-				(await userGuild).setNickname(stripedUsername);
-	
-				//Adds the cooldown
-				handCooldown.add(user.id);
-				setTimeout(() => {
-					// Removes the user from the set after a minute
-					handCooldown.delete(user.id);
-				}, 5000);
-			}
+			//Added to hands role
+			(await userGuild).roles.remove(handRole.id);
 		}
 	}
 });
